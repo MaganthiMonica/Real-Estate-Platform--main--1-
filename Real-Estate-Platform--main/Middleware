@@ -1,0 +1,25 @@
+app.use((req, res, next) => {
+  if (req.headers['x-api-key'] !== API_KEY) {
+    return res.status(401).json({ msg: 'Unauthorized' });
+  }
+  next();
+});
+
+app.get('/api/projects', (req, res) => {
+  res.json(projects);
+});
+
+app.post('/api/properties', (req, res) => {
+  const { title, size, price, handoverDate, projectId } = req.body;
+  if (!title || !size || !price || !handoverDate || !projectId) {
+    return res.status(400).json({ msg: 'All fields are required.' });
+  }
+  if (size <= 0 || price <= 0 || new Date(handoverDate) <= new Date()) {
+    return res.status(400).json({ msg: 'Invalid values.' });
+  }
+
+  properties.push({ title, size, price, handoverDate, projectId });
+  res.status(201).json({ msg: 'Property added.' });
+});
+
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
